@@ -6,10 +6,7 @@ RUN \
 	apt-get clean && \
 	find /var/lib/apt/lists -type f | xargs rm -vf
 
-RUN useradd -m steam
-
 WORKDIR /home/steam
-USER steam
 
 ADD kf2_functions.sh kf2_functions.sh 
 ADD main main 
@@ -27,4 +24,3 @@ EXPOSE 7777/udp
 EXPOSE 8080/tcp
 
 ENTRYPOINT ["/bin/bash", "main"]
-
