@@ -1,10 +1,10 @@
-docker-kf2
+docker-kf2server
 ==========
 
 Dockerfile for running a Killing Floor 2 server
 
-* GitHub: https://github.com/dwurf/docker-kf2
-* Docker Hub: https://hub.docker.com/r/dwurf/docker-kf2/
+* GitHub: https://github.com/uberjew666/docker-kf2server
+* Docker Hub: https://hub.docker.com/repository/docker/uberjew666/kf2server/
 
 Requirements
 ------------
@@ -25,34 +25,34 @@ With docker `-v` mounts you can add `:z` to the end of the mount argument to add
 Simple start
 ------------
 
-    mkdir -p $HOME/{kf2,kf2_steamdir}
-    docker run -d -t --name kf2 -p 0.0.0.0:20560:20560/udp \
+    mkdir -p $HOME/kf2
+    docker run -d -t --name kf2server \
+        -p 0.0.0.0:20560:20560/udp \
         -p 0.0.0.0:27015:27015/udp \
         -p 0.0.0.0:7777:7777/udp \
         -p 0.0.0.0:8080:8080 \
         -v $HOME/kf2:/home/steam/kf2server \
-        -v $HOME/kf2_steamdir:/home/steam/steam \
-        dwurf/docker-kf2:latest
+        uberjew666/kf2server:latest
 
 Configuring the server
 ----------------------
 
 Configuration is done via environment variables. To run a long, hard server:
 
-    docker run -d -t --name kf2 -p 0.0.0.0:20560:20560/udp \
+    docker run -d -t --name kf2server \
+        -p 0.0.0.0:20560:20560/udp \
         -p 0.0.0.0:27015:27015/udp \
         -p 0.0.0.0:7777:7777/udp \
         -p 0.0.0.0:8080:8080 \
         -v $HOME/kf2:/home/steam/kf2server \
-        -v $HOME/kf2_steamdir:/home/steam/steam \
         -e KF_DIFFICULTY=1 \
         -e KF_GAME_LENGTH=2 \
-        dwurf/docker-kf2:latest
+        uberjew666/kf2server:latest
 
 Updating the server
 -------------------
 
-Run with the command `update`
+Set the KF_UPDATE_SERVER environmental variable to true:
 
     docker run -d -t --name kf2 -p 0.0.0.0:20560:20560/udp \
         -p 0.0.0.0:27015:27015/udp \
@@ -60,19 +60,8 @@ Run with the command `update`
         -p 0.0.0.0:8080:8080 \
         -v $HOME/kf2:/home/steam/kf2server \
         -v $HOME/kf2_steamdir:/home/steam/steam \
-        dwurf/docker-kf2:latest \
-        update
-
-Further arguments get passed to the update command, e.g.
-
-    docker run -d -t --name kf2 -p 0.0.0.0:20560:20560/udp \
-        -p 0.0.0.0:27015:27015/udp \
-        -p 0.0.0.0:7777:7777/udp \
-        -p 0.0.0.0:8080:8080 \
-        -v $HOME/kf2:/home/steam/kf2server \
-        -v $HOME/kf2_steamdir:/home/steam/steam \
-        dwurf/docker-kf2:latest \
-        update -beta preview validate
+        -e KF_UPDATE_SERVER=true \
+        uberjew666/kf2server:latest
 
 Variables
 ---------
@@ -89,22 +78,20 @@ Variables
 | `KF_QUERY_PORT`       | `KF_PORT + 19238` | The query port used to this server instance.                                                                                                                                                               |
 | `KF_MUTATORS`         | `''`              | If the mutators are correctly installed on the server they can be used like this: `mutator=ClassicScoreboard.ClassicSCMut,KFMutator.KFMutator_MaxPlayersV2` Multiple mutators must be seperated with a `,` |
 | `KF_SERVER_NAME`      | `KF2`             | The server name to display in the server browser.                                                                                                                                                          |
+| `KF_UPDATE_SERVER`    | `false`           | Forces steamcmd to download the server files, even if already installed. Useful for when new event updates are released.                                                                                   |
 | `KF_ENABLE_WEB`       | `false`           | A boolean toggle for the web interface hosted on the KF_WEBADMIN_PORT (default 8080) If setting this to true, it's recommended you change the `KF_ADMIN_PASS` variable too.                                |
 | `KF_WEBADMIN_PORT`    | `8080`            | The port used to access the web admin interface.                                                                                                                                                           |
 | `KF_DISABLE_TAKEOVER` | `false`           | Allows the server to be used by other players looking to create a private game when the server is uninhabited.                                                                                             |
-| `KF_BANNER_LINK`      | `http:\/\/art.tripwirecdn.com\/TestItemIcons\/MOTDServer.png` | A link to a PNG file to display on the server welcome page. You must escape special characters. |
-| `KF_MOTD`             | `Welcome to our server. \n \n Have fun and good luck!` | A MOTD message to show under the banner image on the welcome page. You must escape special characters. |
-| `KF_WEBSITE_LINK` | `http:\/\/killingfloor2.com` | A website link shown at the bottom of the srver welcome page to allow the visitor to go to your site. You must escape special characters. |
-| `MULTIHOME_IP` | `''` | Sets the IP to run the server on in cases where it has been assigned multiple public IPs. |
-
-**NOTE:** Special characters are anything that `sed` considers special, so /, ^, \, * etc. To escape the character, prepend \ before it as in the examples provided in the compose files and above.
+| `KF_BANNER_LINK`      | `http://art.tripwirecdn.com/TestItemIcons/MOTDServer.png` | A link to a PNG file to display on the server welcome page. You must escape special characters.                                                                    |
+| `KF_MOTD`             | `Welcome to our server. \n \n Have fun and good luck!` | A MOTD message to show under the banner image on the welcome page. You must escape special characters.                                                                |
+| `KF_WEBSITE_LINK`     | `http://killingfloor2.com` | A website link shown at the bottom of the srver welcome page to allow the visitor to go to your site. You must escape special characters.                                                         |
+| `MULTIHOME_IP`        | `''`              | Sets the IP to run the server on in cases where it has been assigned multiple public IPs.                                                                                                                  |
 
 
 Running multiple servers
 ------------------------
 
-1. Ensure 'command' in docker-compose.yml is not present. Updates will be
-   handled from the first server only.
+1. Ensure 'KF_UPDATE_SERVER' is not set to 'true'. Updates will be handled from the first server only.
 2. Change ports (increment), set environment variables to match
 3. Change server name (optional)
 
@@ -116,7 +103,6 @@ Map the following read-only volume from server 1
 
 Map the following read-write volumes
 
- - $HOME/kf2-server2/steam/:/home/steam/steam
  - $HOME/kf2-server2/kf2server/KFGame/Logs:/home/steam/kf2server/KFGame/Logs
  - $HOME/kf2-server2/kf2server/KFGame/Config:/home/steam/kf2server/KFGame/Config
 
@@ -165,20 +151,4 @@ Examples:
 Building the image
 ------------------
 
-    docker build -t dwurf/docker-kf2:latest .
-
-Similar projects
-----------------
-
-* [KF1 server in Docker](https://github.com/Vel-San/killing-floor-docker)
-
-TODO
-----
-
-* Add support for running multiple KF2 servers from the one directory
-* Map logs and config to another volume(s)
-* This is docker, we shouldn't need logs (use `docker logs`) and config should be done via env variables (i.e. move the config file outside of the volume but it doesn't need to be exposed)
-* See also ConfigSubDir under https://wiki.tripwireinteractive.com/index.php?title=Dedicated_Server_(Killing_Floor_2)#Command_Line_Launch_Options
-* Add support for custom map cycles https://wiki.tripwireinteractive.com/index.php?title=Dedicated_Server_(Killing_Floor_2)#Maps
-
-
+    docker build -t uberjew666/docker-kf2server:latest .
