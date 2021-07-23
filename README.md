@@ -4,7 +4,7 @@ docker-kf2server
 Dockerfile for running a Killing Floor 2 server
 
 * GitHub: https://github.com/uberjew666/docker-kf2server
-* Docker Hub: https://hub.docker.com/repository/docker/uberjew666/kf2server/
+* Docker Hub: https://hub.docker.com/r/uberjew666/kf2server
 
 Requirements
 ------------
