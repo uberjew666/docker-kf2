@@ -65,9 +65,9 @@ if [[ ! -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]]; then
 fi
 
 # Update configuration files
-if [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" &&
-      -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" &&
-      -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFWeb.ini" ]]; then
+if [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]] ||
+   [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" ]] ||
+   [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFWeb.ini" ]]; then
 
   log "Updating configuration files..."
 
