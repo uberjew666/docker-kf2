@@ -20,7 +20,7 @@ initialize() {
   line
 }
 
-log "Variables loaded....."
+log "Variables loaded..."
 log "Port: ${KF_PORT}"
 log "Name: ${KF_SERVER_NAME}"
 log "Mode: ${KF_GAME_MODE}"
@@ -29,7 +29,7 @@ log "Password: (REDACTED)"
 log "Running Install... (be patient, 16 GB+)"
 
 # Install server using steamcmd
-if [ ! -f "/home/steam/kf2server/Binaries/Win64/KFGameSteamServer.bin.x86_64" ]; then
+if [[ ! -f "/home/steam/kf2server/Binaries/Win64/KFGameSteamServer.bin.x86_64" ]]; then
   cd "/home/steam/steamcmd" || exit 1
   ./steamcmd.sh                              \
   +login anonymous                           \
@@ -39,6 +39,7 @@ else
   log "Skipping install process, looks like kf2server is already installed"
 fi
 
+# Forcely update server using steamcmd
 if [[ "${KF_UPDATE_SERVER}" == 'true' ]]; then
   log "Attempting to update before launching the server!"
   rm -rf "/home/steam/Steam/steamapps"
@@ -54,7 +55,7 @@ cp --force /home/steam/steamcmd/linux64/steamclient.so /home/steam/kf2server/lin
 cp --force /home/steam/steamcmd/linux64/steamclient.so /home/steam/kf2server/steamclient.so
 
 # Generate configuration files
-if [ ! -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]; then
+if [[ ! -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]]; then
   log "It appears the config file is missing, generating..."
   "/home/steam/kf2server/Binaries/Win64/KFGameSteamServer.bin.x86_64" kf-bioticslab?difficulty=0?adminpassword=secret?gamepassword=secret -port=7777 &
   sleep 20
@@ -63,33 +64,42 @@ if [ ! -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]; then
   log "Configuration files generated"
 fi
 
-log "Updating configuration files..."
+# Update configuration files
+if [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" &&
+      -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" &&
+      -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFWeb.ini" ]]; then
 
-# Update server configuration files
-if [[ "${KF_GAME_MODE}" == 'VersusSurvival' ]]; then
-  KF_GAME_MODE='VersusSurvival?maxplayers=12';
-fi
+  log "Updating configuration files..."
 
-# default to $(($KF_PORT + 19238))
-[[ -z "${KF_QUERY_PORT}" ]] && export KF_QUERY_PORT="$((KF_PORT + 19238))"
+  if [[ "${KF_GAME_MODE}" == 'VersusSurvival' ]]; then
+    KF_GAME_MODE='VersusSurvival?maxplayers=12';
+  fi
 
-## Now we edit the config files to set the config
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo GameLength "${KF_GAMELENGTH}"
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" Engine.GameReplicationInfo ServerName "${KF_SERVER_NAME}"
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/KFWeb.ini" IpDrv.WebServer bEnabled "${KF_ENABLE_WEB}"
-if [[ "${KF_DISABLE_TAKEOVER}" == 'true' ]]; then
-  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" Engine.GameEngine bUsedForTakeover "FALSE"
+  # default to $(($KF_PORT + 19238))
+  [[ -z "${KF_QUERY_PORT}" ]] && export KF_QUERY_PORT="$((KF_PORT + 19238))"
+
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo GameLength "${KF_GAMELENGTH}"
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" Engine.GameReplicationInfo ServerName "${KF_SERVER_NAME}"
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo BannerLink "${KF_BANNER_LINK}"
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo ServerMOTD "${KF_MOTD}"
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo WebsiteLink "${KF_WEBSITE_LINK}"
+
+  crudini --set --existing "/home/steam/kf2server/KFGame/Config/KFWeb.ini" IpDrv.WebServer bEnabled "${KF_ENABLE_WEB}"
+
+  # remove both existing DownloadManagers parameters
+  crudini --del "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" IpDrv.TcpNetDriver DownloadManagers
+  crudini --set "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" IpDrv.TcpNetDriver DownloadManagers OnlineSubsystemSteamworks.SteamWorkshopDownload
+  if [[ "${KF_DISABLE_TAKEOVER}" == 'true' ]]; then
+    crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" Engine.GameEngine bUsedForTakeover "FALSE"
+  else
+    crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" Engine.GameEngine bUsedForTakeover "TRUE"
+  fi
+
+  log "All configuration files have been updated"
 else
-  crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" Engine.GameEngine bUsedForTakeover "TRUE"
+  log "One or several configuration files are not present. Exiting.."
+  exit 1
 fi
-sed -i "s/^DownloadManagers=IpDrv.HTTPDownload/DownloadManagers=OnlineSubsystemSteamworks.SteamWorkshopDownload/" "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini"
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo BannerLink "${KF_BANNER_LINK}"
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo ServerMOTD "${KF_MOTD}"
-crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" KFGame.KFGameInfo WebsiteLink "${KF_WEBSITE_LINK}"
-
-## Now we edit the config files to set the config
-
-log "All configuration files have been updated"
 
 line
 log "Launching the server"

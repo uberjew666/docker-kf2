@@ -33,16 +33,9 @@ setup_filesystem() {
   STEAM_UID=${PUID:=1000}
   STEAM_GID=${PGID:=1000}
 
-  # Maps
   mkdir -p "/home/steam/kf2server/KFGame/BrewedPC/Maps"
-
-  # Workshop
   mkdir -p "/home/steam/kf2server/Binaries/Win64/steamapps/workshop"
-
-  # Cache
   mkdir -p "/home/steam/kf2server/KFGame/Cache"
-
-  # Other
   chown -R ${STEAM_UID}:${STEAM_GID} "/home/steam/"
 }
 
