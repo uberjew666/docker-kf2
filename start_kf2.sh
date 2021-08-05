@@ -88,7 +88,10 @@ if [[ -f "/home/steam/kf2server/KFGame/Config/LinuxServer-KFGame.ini" ]] ||
 
   # remove both existing DownloadManagers parameters
   crudini --del "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" IpDrv.TcpNetDriver DownloadManagers
+
   crudini --set "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" IpDrv.TcpNetDriver DownloadManagers OnlineSubsystemSteamworks.SteamWorkshopDownload
+  # Add multiplayer mutator
+  crudini --set "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" OnlineSubsystemSteamworks.KFWorkshopSteamworks ServerSubscribedWorkshopItems 675314991
   if [[ "${KF_DISABLE_TAKEOVER}" == 'true' ]]; then
     crudini --set --existing "/home/steam/kf2server/KFGame/Config/LinuxServer-KFEngine.ini" Engine.GameEngine bUsedForTakeover "FALSE"
   else
