@@ -39,7 +39,4 @@ RUN usermod -u ${PUID} steam                            \
     && chmod 755 /start_kf2.sh                          \
     && dos2unix /entrypoint.sh
 
-HEALTHCHECK --interval=1m --timeout=3s --start-period=10m \
-    CMD pidof KFGameSteamServer.bin.x86_64 || exit 1
-
 ENTRYPOINT ["/bin/bash","/entrypoint.sh"]
