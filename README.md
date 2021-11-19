@@ -45,8 +45,8 @@ Configuration is done via environment variables. To run a long, hard server:
         -p 0.0.0.0:7777:7777/udp \
         -p 0.0.0.0:8080:8080 \
         -v $HOME/kf2:/home/steam/kf2server \
-        -e KF_DIFFICULTY=1 \
-        -e KF_GAME_LENGTH=2 \
+        -e KF_DIFFICULTY=hard \
+        -e KF_GAME_LENGTH=long \
         uberjew666/kf2server:latest
 
 Updating the server
@@ -69,10 +69,10 @@ Variables
 | Variable              | Default           | Description                                                                                                                                                                                                |
 |-----------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `KF_MAP`              | `KF-BioticsLab`   | Starting map when the server is first loaded.                                                                                                                                                              |
-| `KF_DIFFICULTY`       | `0`               | Game difficulty.  * 0 - normal * 1 - hard * 2 - suicidal * 3 - hell on earth                                                                                                                               |
+| `KF_DIFFICULTY`       | `normal`          | Game difficulty. * normal * hard * suicidal * hellonearth                                                                                                                                                  |
 | `KF_ADMIN_PASS`       | `secret`          | Used for web console and in-game admin logins.                                                                                                                                                             |
 | `KF_GAME_PASS`        | `''`              | The password used to access the game. Setting this will make the server "private".                                                                                                                         |
-| `KF_GAME_LENGTH`      | `1`               | The length of the game. * 0 - 4 waves * 1 - 7 waves * 2 - 10 waves                                                                                                                                         |
+| `KF_GAME_LENGTH`      | `normal`          | The length of the game. * short - 4 waves * normal - 7 waves * long - 10 waves                                                                                                                             |
 | `KF_GAME_MODE`        | `Survival`        | The gametype to use. * Survival * VersusSurvival * WeeklySurvival * Endless                                                                                                                                |
 | `KF_PORT`             | `7777`            | The game port (UDP) used to accept incoming clients. This is the port entered in the ingame console's `open` command.                                                                                      |
 | `KF_QUERY_PORT`       | `KF_PORT + 19238` | The query port used to this server instance.                                                                                                                                                               |
