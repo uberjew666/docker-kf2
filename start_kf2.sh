@@ -33,23 +33,19 @@ log "Running Install... (be patient, 16 GB+)"
 # Install server using steamcmd
 if [[ ! -f "/home/steam/kf2server/Binaries/Win64/KFGameSteamServer.bin.x86_64" ]]; then
   cd "/home/steam/steamcmd" || exit 1
-  ./steamcmd.sh                              \
-  +login anonymous                           \
-  +force_install_dir "/home/steam/kf2server" \
-  +app_update 232130 validate +exit
+  steamcmd="./steamcmd.sh"
+  steamcmd+=" +force_install_dir /home/steam/kf2server"
+  steamcmd+=" +login anonymous"
+  steamcmd+=" +app_update 232130"
+  [[ "${KF_ENABLE_BETA}" == "true" ]] && steamcmd+=" -beta preview"
+  [[ "${KF_UPDATE_SERVER}" == "true" ]] && steamcmd+=" update"
+  steamcmd+=" validate"
+  steamcmd+=" +exit"
+
+  eval $steamcmd
+
 else
   log "Skipping install process, looks like kf2server is already installed"
-fi
-
-# Forcely update server using steamcmd
-if [[ "${KF_UPDATE_SERVER}" == 'true' ]]; then
-  log "Attempting to update before launching the server!"
-  rm -rf "/home/steam/Steam/steamapps"
-  cd "/home/steam/steamcmd" || exit 1
-  ./steamcmd.sh                              \
-  +login anonymous                           \
-  +force_install_dir "/home/steam/kf2server" \
-  +app_update 232130 update validate +exit
 fi
 
 cp --force /home/steam/steamcmd/linux64/steamclient.so /home/steam/kf2server/Binaries/Win64/lib64/steamclient.so

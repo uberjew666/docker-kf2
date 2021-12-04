@@ -21,6 +21,7 @@ ENV PUID=1000                                                                \
     KF_MUTATORS=""                                                           \
     KF_SERVER_NAME="KF2"                                                     \
     KF_UPDATE_SERVER="false"                                                 \
+    KF_ENABLE_BETA="false"                                                   \
     KF_ENABLE_WEB="false"                                                    \
     KF_WEBADMIN_PORT="8080"                                                  \
     KF_DISABLE_TAKEOVER="false"                                              \
